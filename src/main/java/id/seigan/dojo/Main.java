@@ -62,11 +62,6 @@ public class Main {
                     break;
 
                 case 3 :
-                    Account gMail = new Account("Gmail", "24234","udin@gmail.com", "sedunia");
-                    List<Account> accounttList = new ArrayList<>();
-                    accounttList.add(gMail);
-                    ObjectSaver.saveObject(accounttList);
-
                     Object filecek = null;
                     try {
                         masuk.nextLine();
@@ -82,17 +77,6 @@ public class Main {
                             throw e;
                         }
                     }
-
-//                    Object file3 = ObjectSaver.retrieveObject();
-//                    masuk.nextLine();
-//                    if(file3 instanceof List){
-//                        List<Account> accountList = (List<Account>)file3;
-//                        addAccount(accountList);
-//                    }else{
-//                        System.out.println("Telah dibuat file baru!");
-//                        List<Account> accountList = new ArrayList<>();
-//                        addAccount(accountList);
-//                    }
                     break;
 
                 case 4 :
@@ -108,16 +92,17 @@ public class Main {
                                 System.out.println("Akun ditemukan!");
                                 System.out.print("Password baru : ");
                                 String password = masuk.nextLine();
-                                HashMap<String, String> Password = new HashMap<String, String>();
+                                HashMap<String, String> Password = acc.getPasswordHistory();
                                 String pattern = "MM/dd/yyyy HH:mm:ss";
                                 DateFormat df = new SimpleDateFormat(pattern);
                                 Date waktu = new Date();
                                 String waktuUbah = df.format(waktu);
                                 Password.put(waktuUbah, password);
-//                                acc.setPassword(password);
+                                acc.setPassword(password, Password);
                                 cekUbah = true;
                             }
                         }
+                        ObjectSaver.saveObject(accounts);
                     }
                     if(!cekUbah){
                         System.out.println("Akun tidak ditemukan!");
@@ -135,7 +120,7 @@ public class Main {
                         for(Account acc: accounts){
                             if(namaAkun.equals(acc.getAccountName())){
                                 System.out.println("Akun ditemukan!");
-                                System.out.print("Histori password : ");
+                                System.out.println("Histori perubahan password : ");
                                 acc.passwordHistory();
                                 cekPass = true;
                             }
@@ -197,7 +182,7 @@ public class Main {
         Date waktu = new Date();
         String waktuUbah = df.format(waktu);
         Password.put(waktuUbah, password);
-        Account newAccount = new Account(namaAkun, url, username, password);
+        Account newAccount = new Account(namaAkun, url, username, password, Password);
         akun.add(newAccount);
         ObjectSaver.saveObject(akun);
     }
