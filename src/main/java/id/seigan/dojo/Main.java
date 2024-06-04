@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args){
-        ObjectSaver.fileName = "D:/Bootcamp/programming-temp/account_manager/account.txt";
+        ObjectSaver.fileName = "D:/Bootcamp/programming-temp/account_manager/account.txt"; //change your own file path
 
         Scanner masuk = new Scanner(System.in);
         int pilih;
@@ -134,7 +134,8 @@ public class Main {
                 case 6 :
                     Object file6 = ObjectSaver.retrieveObject();
                     masuk.nextLine();
-                    boolean cekHapus = false;
+                    int h = 0, x = 0;
+                    boolean cekHapus = false, hapus = false;
                     System.out.println("Masukkan nama akun yang ingin dihapus : ");
                     namaAkun = masuk.nextLine();
                     if(file6 instanceof List){
@@ -142,11 +143,17 @@ public class Main {
                         for(Account acc: accounts){
                             if(namaAkun.equals(acc.getAccountName())){
                                 System.out.println("Akun ditemukan!");
-                                System.out.print("Histori password : ");
-                                acc.passwordHistory();
+                                System.out.print("Akun berhasil dihapus!");
+                                x = h;
                                 cekHapus = true;
+                                hapus = true;
                             }
+                            h++;
                         }
+                        if(hapus){
+                            accounts.remove(x);
+                        }
+                        ObjectSaver.saveObject(accounts);
                     }
                     if(!cekHapus){
                         System.out.println("Akun tidak ditemukan!");
