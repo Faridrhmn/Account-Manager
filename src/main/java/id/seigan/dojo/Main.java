@@ -1,9 +1,13 @@
 package id.seigan.dojo;
 
+import java.io.InvalidClassException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-import java.io.IOException;
+import java.util.Date;
 
 public class Main {
     public static void main(String[] args){
@@ -11,6 +15,7 @@ public class Main {
 
         Scanner masuk = new Scanner(System.in);
         int pilih;
+        String namaAkun;
         do {
             System.out.println("Menu operasi");
             System.out.println("1. Tampil daftar akun \n2. Tampil akun\n3. tambah akun\n4. Ubah password\n5. Riwayat perubahan password\n6. Hapus akun\n0. Keluar");
@@ -18,45 +23,149 @@ public class Main {
             pilih = masuk.nextInt();
             switch (pilih){
                 case 1 :
-                    Object object = ObjectSaver.retrieveObject();
-                    if(object instanceof List){
-                        List<Account> accounts = (List<Account>)object;
+                    int i = 1;
+                    Object file = ObjectSaver.retrieveObject();
+                    System.out.println("Daftar akun: ");
+                    System.out.println("------------");
+                    if(file instanceof List){
+                        List<Account> accounts = (List<Account>)file;
                         for(Account acc: accounts){
-                            System.out.println(acc.getAccountName()+ " - " +acc.getPassword()+" - "+ acc.getUsername());
+                            System.out.println(i + ". " + acc.getAccountName());
+                            i++;
                         }
                     }
                     break;
 
                 case 2 :
-                    System.out.println("dua");
+                    masuk.nextLine();
+                    Object file2 = ObjectSaver.retrieveObject();
+                    boolean cek = false;
+                    System.out.print("Masukkan nama akun yang ingin dicari : ");
+                    namaAkun = masuk.nextLine();
+                    if(file2 instanceof List){
+                        List<Account> accounts = (List<Account>)file2;
+                        for(Account acc: accounts){
+                            if(namaAkun.equals(acc.getAccountName())){
+                                System.out.println("Akun ditemukan dengan detail : ");
+                                System.out.println("Nama akun : " + acc.getAccountName());
+                                System.out.println("Url akun  : " + acc.getSiginUrl());
+                                System.out.println("Username  : " + acc.getUsername());
+                                System.out.println("Password  : " + acc.getPassword());
+                                cek = true;
+                            }
+                        }
+                    }
+                    if(!cek){
+                        System.out.println("Akun tidak ditemukan!");
+                    }
+
                     break;
 
                 case 3 :
-                    System.out.println("Tambah akun");
-                    Account gMail = new Account("Gmail", "udin@gmail.com", "sedunia");
-                    Account livinMandiri = new Account("Livin", "livinUdin","seduniaLivin");
-                    Account ML = new Account("ikaeda", "udin", "1234");
+                    Account gMail = new Account("Gmail", "24234","udin@gmail.com", "sedunia");
+                    List<Account> accounttList = new ArrayList<>();
+                    accounttList.add(gMail);
+                    ObjectSaver.saveObject(accounttList);
 
-                    List<Account> accountList = new ArrayList<>();
-                    accountList.add(gMail);
-                    accountList.add(livinMandiri);
-                    accountList.add(ML);
+                    Object filecek = null;
+                    try {
+                        masuk.nextLine();
+                        filecek = ObjectSaver.retrieveObject();
+                        List<Account> accountList = (List<Account>)filecek;
+                        addAccount(accountList);
+                    } catch (RuntimeException e) {
+                        if (e.getCause() instanceof InvalidClassException) {
+                            System.out.println("Telah dibuat file baru!");
+                            List<Account> accountList = new ArrayList<>();
+                            addAccount(accountList);
+                        } else {
+                            throw e;
+                        }
+                    }
 
-
-                    System.out.println(accountList.contains(gMail));
-                    ObjectSaver.saveObject(accountList);
+//                    Object file3 = ObjectSaver.retrieveObject();
+//                    masuk.nextLine();
+//                    if(file3 instanceof List){
+//                        List<Account> accountList = (List<Account>)file3;
+//                        addAccount(accountList);
+//                    }else{
+//                        System.out.println("Telah dibuat file baru!");
+//                        List<Account> accountList = new ArrayList<>();
+//                        addAccount(accountList);
+//                    }
                     break;
 
                 case 4 :
-                    System.out.println("empat");
+                    Object file4 = ObjectSaver.retrieveObject();
+                    masuk.nextLine();
+                    boolean cekUbah = false;
+                    System.out.println("Masukkan nama akun yang ingin diubah passwordnya : ");
+                    namaAkun = masuk.nextLine();
+                    if(file4 instanceof List){
+                        List<Account> accounts = (List<Account>)file4;
+                        for(Account acc: accounts){
+                            if(namaAkun.equals(acc.getAccountName())){
+                                System.out.println("Akun ditemukan!");
+                                System.out.print("Password baru : ");
+                                String password = masuk.nextLine();
+                                HashMap<String, String> Password = new HashMap<String, String>();
+                                String pattern = "MM/dd/yyyy HH:mm:ss";
+                                DateFormat df = new SimpleDateFormat(pattern);
+                                Date waktu = new Date();
+                                String waktuUbah = df.format(waktu);
+                                Password.put(waktuUbah, password);
+//                                acc.setPassword(password);
+                                cekUbah = true;
+                            }
+                        }
+                    }
+                    if(!cekUbah){
+                        System.out.println("Akun tidak ditemukan!");
+                    }
                     break;
 
                 case 5 :
-                    System.out.println("lima");
+                    Object file5 = ObjectSaver.retrieveObject();
+                    masuk.nextLine();
+                    boolean cekPass = false;
+                    System.out.println("Masukkan nama akun untuk melihat histori password : ");
+                    namaAkun = masuk.nextLine();
+                    if(file5 instanceof List){
+                        List<Account> accounts = (List<Account>)file5;
+                        for(Account acc: accounts){
+                            if(namaAkun.equals(acc.getAccountName())){
+                                System.out.println("Akun ditemukan!");
+                                System.out.print("Histori password : ");
+                                acc.passwordHistory();
+                                cekPass = true;
+                            }
+                        }
+                    }
+                    if(!cekPass){
+                        System.out.println("Akun tidak ditemukan!");
+                    }
                     break;
 
                 case 6 :
-                    System.out.println("enam");
+                    Object file6 = ObjectSaver.retrieveObject();
+                    masuk.nextLine();
+                    boolean cekHapus = false;
+                    System.out.println("Masukkan nama akun yang ingin dihapus : ");
+                    namaAkun = masuk.nextLine();
+                    if(file6 instanceof List){
+                        List<Account> accounts = (List<Account>)file6;
+                        for(Account acc: accounts){
+                            if(namaAkun.equals(acc.getAccountName())){
+                                System.out.println("Akun ditemukan!");
+                                System.out.print("Histori password : ");
+                                acc.passwordHistory();
+                                cekHapus = true;
+                            }
+                        }
+                    }
+                    if(!cekHapus){
+                        System.out.println("Akun tidak ditemukan!");
+                    }
                     break;
 
                 case 0:
@@ -66,27 +175,30 @@ public class Main {
                 default:
                     System.out.println("Maaf inputan salah perhatikan perintah, 1-6 untuk menu, 0 untuk keluar");
             }
-            try {
-                // Print the OS name for debugging
-                System.out.println("OS: " + System.getProperty("os.name"));
-
-                // Simple command to test ProcessBuilder
-                ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "echo Hello");
-                Process process = processBuilder.inheritIO().start();
-                int exitCode = process.waitFor();
-                System.out.println("Simple command exit code: " + exitCode);
-
-                // Attempt to clear the console
-                processBuilder = new ProcessBuilder("cmd", "/c", "cls");
-                process = processBuilder.inheritIO().start();
-                exitCode = process.waitFor();
-                System.out.println("Clear command exit code: " + exitCode);
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            System.out.println();
+            System.out.println();
         }while(pilih != 0);
+    }
+
+    public static void addAccount(List<Account> akun){
+        Scanner masuk = new Scanner(System.in);
+        System.out.println("Tambah akun");
+        System.out.print("Masukkan nama akun : ");
+        String namaAkun = masuk.nextLine();
+        System.out.print("Masukkan url akun  : ");
+        String url = masuk.nextLine();
+        System.out.print("Masukkan username  : ");
+        String username = masuk.nextLine();
+        System.out.print("Masukkan password  : ");
+        String password = masuk.nextLine();
+        HashMap<String, String> Password = new HashMap<String, String>();
+        String pattern = "MM/dd/yyyy HH:mm:ss";
+        DateFormat df = new SimpleDateFormat(pattern);
+        Date waktu = new Date();
+        String waktuUbah = df.format(waktu);
+        Password.put(waktuUbah, password);
+        Account newAccount = new Account(namaAkun, url, username, password);
+        akun.add(newAccount);
+        ObjectSaver.saveObject(akun);
     }
 }
