@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args){
-        ObjectSaver.fileName = "D:/Bootcamp/programming-temp/account_manager/account.txt"; //change your own file path
+        ObjectSaver.fileName = "D:/Bootcamp/programming-temp/account_manager/account.txt";
 
         Scanner masuk = new Scanner(System.in);
         int pilih;
@@ -33,6 +33,8 @@ public class Main {
                             System.out.println(i + ". " + acc.getAccountName());
                             i++;
                         }
+                    } else{
+                        System.out.println("TIdak ada akun dalam list");
                     }
                     break;
 
@@ -50,7 +52,7 @@ public class Main {
                                 System.out.println("Nama akun : " + acc.getAccountName());
                                 System.out.println("Url akun  : " + acc.getSiginUrl());
                                 System.out.println("Username  : " + acc.getUsername());
-                                System.out.println("Password  : " + acc.getPassword());
+                                System.out.println("Password  : " + dekripVignere(acc.getPassword(), "pass"));
                                 cek = true;
                             }
                         }
@@ -91,7 +93,8 @@ public class Main {
                             if(namaAkun.equals(acc.getAccountName())){
                                 System.out.println("Akun ditemukan!");
                                 System.out.print("Password baru : ");
-                                String password = masuk.nextLine();
+                                String pass = masuk.nextLine();
+                                String password = enkripVignere(pass, "pass");
                                 HashMap<String, String> Password = acc.getPasswordHistory();
                                 String pattern = "MM/dd/yyyy HH:mm:ss";
                                 DateFormat df = new SimpleDateFormat(pattern);
@@ -182,7 +185,8 @@ public class Main {
         System.out.print("Masukkan username  : ");
         String username = masuk.nextLine();
         System.out.print("Masukkan password  : ");
-        String password = masuk.nextLine();
+        String pass = masuk.nextLine();
+        String password = enkripVignere(pass, "pass");
         HashMap<String, String> Password = new HashMap<String, String>();
         String pattern = "MM/dd/yyyy HH:mm:ss";
         DateFormat df = new SimpleDateFormat(pattern);
@@ -193,4 +197,32 @@ public class Main {
         akun.add(newAccount);
         ObjectSaver.saveObject(akun);
     }
+
+    public static String enkripVignere(String plain, String key){
+        String alpha = "abcdefghijklmnopqrstuvwxyz";
+        char hasil[] = new char[plain.length()];
+        for(int i =0; i<plain.length(); i++){
+            char newKey = key.charAt((i % key.length()));
+            char newPlain = alpha.charAt((alpha.indexOf(newKey)+alpha.indexOf(plain.charAt(i)))%alpha.length());
+            hasil[i] += newPlain;
+        }
+        return new String(hasil);
+    }
+
+    public static String dekripVignere(String ciphertext, String key) {
+        String alpha = "abcdefghijklmnopqrstuvwxyz";
+        int keyIndex = 0;
+        char hasil[] = new char[ciphertext.length()];
+        for (int i = 0; i < ciphertext.length(); i++) {
+            char charCipher = ciphertext.charAt(i);
+            char keyChar = key.charAt(keyIndex % key.length());
+            int newCharIndex = (alpha.indexOf(charCipher) - alpha.indexOf(keyChar) + alpha.length()) % alpha.length();
+            char newChar = alpha.charAt(newCharIndex);
+            hasil[i] += newChar;
+            keyIndex++;
+        }
+        return new String(hasil);
+    }
+
+
 }
